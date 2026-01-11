@@ -23,7 +23,7 @@
 	"icon": "assets/copilot.png",
 	"pricing": "Trial",
 	"engines": {
-		"vscode": "^1.108.0",
+		"vscode": "^1.107.0",
 		"npm": ">=9.0.0",
 		"node": ">=22.14.0"
 	},
@@ -1189,6 +1189,35 @@
 				"legacyToolReferenceFullNames": [
 					"editFiles"
 				]
+			},
+			{
+				"name": "copilot_getSwaggerInfo",
+				"displayName": "Get Swagger/OpenAPI Info",
+				"toolReferenceName": "swaggerInfo",
+				"userDescription": "Recognize Swagger backend API interfaces",
+				"modelDescription": "Parse a Swagger/OpenAPI file and extract API definitions.",
+				"tags": [
+					"vscode_codesearch"
+				],
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"filePaths": {
+							"type": "array",
+							"description": "The absolute paths to the swagger/openapi files.",
+							"items": {
+								"type": "string"
+							}
+						},
+						"urls": {
+							"type": "array",
+							"description": "The URLs of the swagger/openapi files.",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				}
 			}
 		],
 		"languageModelToolSets": [
@@ -1725,7 +1754,6 @@
 			},
 			{
 				"vendor": "customoai",
-				"when": "productQualityType != 'stable'",
 				"displayName": "OpenAI Compatible",
 				"managementCommand": "github.copilot.chat.manageBYOK"
 			}
@@ -5161,6 +5189,7 @@
 		"@github/copilot": "^0.0.366",
 		"@google/genai": "^1.22.0",
 		"@humanwhocodes/gitignore-to-minimatch": "1.0.2",
+		"@iarna/toml": "^2.2.5",
 		"@microsoft/tiktokenizer": "^1.0.10",
 		"@sinclair/typebox": "^0.34.41",
 		"@vscode/copilot-api": "^0.2.5",
@@ -5182,7 +5211,8 @@
 		"minimatch": "^10.0.3",
 		"undici": "^7.11.0",
 		"vscode-tas-client": "^0.1.84",
-		"web-tree-sitter": "^0.23.0"
+		"web-tree-sitter": "^0.23.0",
+		"yaml": "^2.8.0"
 	},
 	"overrides": {
 		"@aminya/node-gyp-build": "npm:node-gyp-build@4.8.1",

@@ -33,9 +33,11 @@ import './runNotebookCellTool';
 import './scmChangesTool';
 import './searchWorkspaceSymbolsTool';
 import './simpleBrowserTool';
+import './swaggerInfoTool';
 import './testFailureTool';
 import './toolReplayTool';
 import './usagesTool';
 import './userPreferencesTool';
 import './vscodeAPITool';
 import './vscodeCmdTool';
+
