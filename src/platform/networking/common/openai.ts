@@ -137,8 +137,53 @@ export function rawMessageToCAPI(message: Raw.ChatMessage[] | Raw.ChatMessage, c
 		return message.map(m => rawMessageToCAPI(m, callback));
 	}
 
+	// ... existing code ...
+
+	// Debug logging to inspect incoming message structure
+	if (!Array.isArray(message)) {
+		console.log('[BYOK] rawMessageToCAPI incoming message:', JSON.stringify(message, null, 2));
+	}
+
 	const out: CAPIChatMessage = toMode(OutputMode.OpenAI, message);
+
+	// Log toMode output
+	console.log('[BYOK] toMode output content:', JSON.stringify(out.content, null, 2));
+
+	// Manually convert images if present in the original message
+	if (Array.isArray(message.content) && message.content.length > 0) {
+		// Check if any part has imageUrl property (indicating it's an image)
+		const hasImagePart = message.content.some((part: any) => part.imageUrl || part.image_url);
+
+		if (hasImagePart) {
+			console.log('[BYOK] Image detected in message.content, manually converting');
+			out.content = message.content.map((part: any) => {
+				// Check for image by presence of imageUrl property
+				if (part.imageUrl || part.image_url) {
+					const imageUrl = part.imageUrl || part.image_url;
+					const imageUrlObj = typeof imageUrl === 'string' ? { url: imageUrl, detail: 'auto' } : { ...imageUrl, detail: imageUrl.detail || 'auto' };
+					return {
+						type: 'image_url',
+						image_url: imageUrlObj
+					};
+				}
+				// Check for text
+				else if (part.text !== undefined) {
+					return {
+						type: 'text',
+						text: part.text
+					};
+				}
+				// Fallback: log and skip
+				console.warn('[BYOK] Unrecognized content part:', part);
+				return null;
+			}).filter((p: any) => p !== null);
+
+			console.log('[BYOK] Manually converted content:', JSON.stringify(out.content, null, 2));
+		}
+	}
+
 	if ('copilot_references' in message) {
+		// ... existing code ...
 		out.copilot_references = (message as any).copilot_references;
 	}
 	if ('copilot_confirmations' in message) {

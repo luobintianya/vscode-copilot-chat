@@ -296,9 +296,60 @@ export class OpenAIEndpoint extends ChatEndpoint {
 			}
 			// Removing max tokens defaults to the maximum which is what we want for BYOK
 			// delete body.max_tokens;
-			if (!this.useResponsesApi && body.stream) {
-				// body['stream_options'] = { 'include_usage': true };
+			// Check if the provider is Zhipu AI (GLM) based on domain
+			const isZhipu = this._modelUrl.includes('bigmodel.cn');
+
+			if (!this.useResponsesApi && body.stream && !isZhipu) {
+				(body as Record<string, unknown>)['stream_options'] = { 'include_usage': true };
 			}
+
+			if (isZhipu) {
+				// Compatibility: remove unsupported fields for Zhipu/GLM
+				const unsupportedKeys = [
+					'stream_options',
+					'frequency_penalty',
+					'presence_penalty',
+					'logit_bias',
+					'logprobs',
+					'top_logprobs',
+					'n',
+					'parallel_tool_calls'
+				];
+				for (const key of unsupportedKeys) {
+					if (key in body) {
+						delete (body as Record<string, unknown>)[key];
+					}
+				}
+			}
+
+			// Handle images for non-vision Zhipu models (like GLM-4.7)
+			// GLM-4.7, GLM-4.6, GLM-4.5, GLM-4 are text-only models
+			// GLM-4.6V, GLM-4V, GLM-4.5V are vision models
+			const isTextOnlyModel = this.model.match(/glm-4\.(7|6|5|0)($|[^v])/i) || this.model.match(/glm-4($|[^v])/i);
+
+			if (isTextOnlyModel && body.messages) {
+				this.logService.info('[BYOK] Text-only Zhipu model detected, converting images to text placeholders');
+				body.messages = (body as { messages: Array<{ role: string; content: unknown }> }).messages.map((msg: { role: string; content: unknown }) => {
+					if (Array.isArray(msg.content)) {
+						const hasImage = (msg.content as Array<{ type: string }>).some((part) => part.type === 'image_url');
+						if (hasImage) {
+							// Convert image_url parts to text notifications
+							msg.content = (msg.content as Array<{ type: string;[key: string]: unknown }>).map((part) => {
+								if (part.type === 'image_url') {
+									return {
+										type: 'text',
+										text: '[图片内容: 用户上传了一张图片，但当前模型不支持图片识别。如需处理图片，请使用 GLM-4.6V 或 GLM-4V 模型]'
+									};
+								}
+								return part;
+							});
+						}
+					}
+					return msg;
+				});
+			}
+			this.logService.info(`[BYOK] Request URL: ${this._modelUrl}`);
+			this.logService.info(`[BYOK] Request Body: ${JSON.stringify(body, null, 2)}`);
 		}
 	}
 
@@ -334,6 +385,7 @@ export class OpenAIEndpoint extends ChatEndpoint {
 		// Apply ignoreStatefulMarker: false for initial request
 		const modifiedOptions: IMakeChatRequestOptions = { ...options, ignoreStatefulMarker: false };
 		let response = await super.makeChatRequest2(modifiedOptions, token);
+		this.logService.info(`[BYOK] Response: ${JSON.stringify(response, null, 2)}`);
 		if (response.type === ChatFetchResponseType.InvalidStatefulMarker) {
 			response = await this._makeChatRequest2({ ...options, ignoreStatefulMarker: true }, token);
 		}
