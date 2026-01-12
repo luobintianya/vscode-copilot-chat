@@ -224,7 +224,7 @@ export const toolCategories: Record<ToolName, ToolCategory> = {
 	[ToolName.ToolReplay]: ToolCategory.RedundantButSpecific,
 	[ToolName.CoreConfirmationTool]: ToolCategory.VSCodeInteraction,
 	[ToolName.CoreTerminalConfirmationTool]: ToolCategory.VSCodeInteraction,
-	[ToolName.SwaggerInfo]: ToolCategory.VSCodeInteraction,
+	[ToolName.SwaggerInfo]: ToolCategory.WebInteraction,
 } as const;
 
 

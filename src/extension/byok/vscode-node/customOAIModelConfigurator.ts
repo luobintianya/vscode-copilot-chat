@@ -436,7 +436,7 @@ export class CustomOAIModelConfigurator {
 	private async _selectCapabilities(defaults?: { toolCalling: boolean; vision: boolean; thinking: boolean; requiresAPIKey: boolean }): Promise<{ toolCalling: boolean; vision: boolean; thinking: boolean; requiresAPIKey: boolean } | BackButtonClick | undefined> {
 		const capabilities = {
 			toolCalling: defaults?.toolCalling ?? false,
-			vision: defaults?.vision ?? false,
+			vision: defaults?.vision ?? true,
 			thinking: defaults?.thinking ?? false,
 			requiresAPIKey: this._forceRequiresAPIKey || (defaults?.requiresAPIKey ?? true)
 		};

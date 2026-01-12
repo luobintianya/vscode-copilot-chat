@@ -3,7 +3,7 @@
 .vscode-test-web/
 node_modules/
 dist/
-
+*.vsix
 # created by simulation
 .simulation
 

@@ -1194,11 +1194,11 @@
 				"name": "copilot_getSwaggerInfo",
 				"displayName": "Get Swagger/OpenAPI Info",
 				"toolReferenceName": "swaggerInfo",
+				"icon": "$(json)",
+				"canBeReferencedInPrompt": true,
 				"userDescription": "Recognize Swagger backend API interfaces",
-				"modelDescription": "Parse a Swagger/OpenAPI file and extract API definitions.",
-				"tags": [
-					"vscode_codesearch"
-				],
+				"modelDescription": "Fetch and parse Swagger/OpenAPI specification files to extract API definitions, endpoints, and documentation. Use this tool when the user asks to analyze, read, parse, or get information about Swagger, OpenAPI, or API documentation files. This tool can fetch from URLs (including localhost URLs like http://localhost:8003/api-docs) or read from local file paths. Supports both JSON and YAML formats.",
+				"tags": [],
 				"inputSchema": {
 					"type": "object",
 					"properties": {
@@ -1284,7 +1284,8 @@
 				"icon": "$(globe)",
 				"tools": [
 					"fetch",
-					"githubRepo"
+					"githubRepo",
+					"swaggerInfo"
 				]
 			}
 		],
@@ -5212,7 +5213,8 @@
 		"undici": "^7.11.0",
 		"vscode-tas-client": "^0.1.84",
 		"web-tree-sitter": "^0.23.0",
-		"yaml": "^2.8.0"
+		"yaml": "^2.8.0",
+		"zod": "^3.25.76"
 	},
 	"overrides": {
 		"@aminya/node-gyp-build": "npm:node-gyp-build@4.8.1",
